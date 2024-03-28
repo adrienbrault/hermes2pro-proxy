@@ -1,0 +1,30 @@
+{
+    "name": "adrienbrault/hermes2pro",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "AdrienBrault\\Hermes2Pro\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Adrien Brault",
+            "email": "adrien.brault@gmail.com"
+        }
+    ],
+    "require": {
+        "php-http/client-common": "^2.0",
+        "azjezz/psl": "^2.0"
+    },
+    "require-dev": {
+        "openai-php/client": "^0.8.4",
+        "guzzlehttp/guzzle": "^7.8",
+        "symfony/var-dumper": "^7.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
