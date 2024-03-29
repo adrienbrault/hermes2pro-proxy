@@ -19,6 +19,7 @@ use function Psl\Type\optional;
 use function Psl\Type\shape;
 use function Psl\Type\string;
 use function Psl\Type\vec;
+use function Psl\Vec\filter_nulls;
 use function Psl\Vec\map;
 use function Psl\SecureRandom\string as randomString;
 
@@ -54,6 +55,7 @@ class Hermes2ProPlugin implements Plugin
         }
 
         $payload = decode($request->getBody()->getContents(), true);
+        $request->getBody()->rewind(); // Make sure the body is still readable
 
         $shape = shape([
             'model' => string(),
@@ -71,6 +73,10 @@ class Hermes2ProPlugin implements Plugin
 
         $tools = $payload['tools'] ?? [];
 
+        if ($tools === []) {
+            return null;
+        }
+
         $systemPrompt = implode(" ", [
             'You are a function calling AI model.',
             'You are provided with function signatures within <tools></tools> XML tags.',
@@ -87,10 +93,65 @@ class Hermes2ProPlugin implements Plugin
             '{"name": <function-name>, "arguments": <args-dict>}',
             '</tool_call>.',
             'Only reply with <tool_call>...</tool_call>, no other content.',
-            $payload['messages'][0]['content'],
         ]);
 
-        $payload['messages'][0]['content'] = $systemPrompt;
+        if ($payload['messages'][0]['role'] === 'system') {
+            $payload['messages'][0]['content'] = \Psl\Str\join(
+                [
+                    $systemPrompt,
+                    $payload['messages'][0]['content']
+                ],
+                " "
+            );
+        } else {
+            $payload['messages'] = [
+                [
+                    'role' => 'system',
+                    'content' => $systemPrompt,
+                ],
+                ...$payload['messages'],
+            ];
+        }
+
+        $payload['messages'] = map(
+            $payload['messages'],
+            static function (array $message): array {
+                if ($message['role'] === 'tool') {
+                    return [
+                        'role' => 'system',
+                        'content' => sprintf('<tool_response>%s</tool_response>', $message['content']),
+                    ];
+                }
+
+                if ($message['role'] === 'assistant'
+                    && count($message['tool_calls'] ?? []) > 0
+                ) {
+                    $content = \Psl\Str\join(
+                        [
+                            $message['content'],
+                            ...map(
+                                $message['tool_calls'],
+                                static function (array $toolCall): string {
+                                    return sprintf("<tool_call>\n%s\n</tool_call>", json_encode([
+                                        'name' => $toolCall['function']['name'],
+                                        'arguments' => decode($toolCall['function']['arguments'] ?? '[]'),
+                                    ]));
+                                }
+                            )
+                        ],
+                        "\n"
+                    );
+
+                    return [
+                        'role' => 'assistant',
+                        'content' => \Psl\Str\trim($content)
+                    ];
+                }
+
+                return $message;
+            }
+        );
+
         unset($payload['tools']);
 
         return $request->withBody(
@@ -102,7 +163,12 @@ class Hermes2ProPlugin implements Plugin
 
     private function getHermes2ProResponse(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $payload = decode($response->getBody()->getContents(), true);
+        $payload = decode($response->getBody()->getContents());
+        $response->getBody()->rewind(); // Make sure the body is still readable
+
+        if (!array_key_exists('choices', $payload) || !is_array($payload['choices']) === 0) {
+            return $response;
+        }
 
         $matches = map(
             every_match(
@@ -115,47 +181,50 @@ class Hermes2ProPlugin implements Plugin
             static fn (array $match): string => $match['json']
         );
 
-        $toolCalls = [];
-        foreach ($matches as $jsonString) {
-            $jsonString = trim((string) $jsonString);
+        $toolCalls = map(
+            $matches,
+            function ($jsonString) {
+                $jsonString = trim((string) $jsonString);
 
-            // In case the model adds junk at the end of the json
-            // we try to remove it and parse the json again, and repeat
-            $json = null;
-            for ($i = 0; $i < 30; ++$i) {
-                $json = @json_decode($jsonString, true, \JSON_PARTIAL_OUTPUT_ON_ERROR);
+                // In case the model adds junk at the end of the json
+                // we try to remove it and parse the json again, and repeat
+                $json = null;
+                for ($i = 0; $i < 30; ++$i) {
+                    $json = @json_decode($jsonString, true, \JSON_PARTIAL_OUTPUT_ON_ERROR);
 
-                if ($json !== null) {
-                    break;
+                    if ($json !== null) {
+                        break;
+                    }
+
+                    $jsonString = substr($jsonString, 0, -1);
                 }
 
-                $jsonString = substr($jsonString, 0, -1);
-            }
+                if ($json === null) {
+                    return null;
+                }
 
-            if ($json === null) {
-                continue;
-            }
+                shape([
+                    'name' => string(),
+                    'arguments' => mixed_dict(),
+                ])->assert($json);
 
-            shape([
-                'name' => string(),
-                'arguments' => mixed_dict(),
-            ])->assert($json);
-
-            $toolCalls[] = [
-                'id' => 'call_' . randomString(24),
-                'type' => 'function',
-                'function' => [
-                    'name' => $json['name'],
-                    'arguments' => encode([
-                        ...$json['arguments'],
-                        ...array_diff_key($json, [
-                            'name' => null,
-                            'arguments' => null,
+                return [
+                    'id' => 'call_' . randomString(24),
+                    'type' => 'function',
+                    'function' => [
+                        'name' => $json['name'],
+                        'arguments' => encode([
+                            ...$json['arguments'],
+                            ...array_diff_key($json, [
+                                'name' => null,
+                                'arguments' => null,
+                            ]),
                         ]),
-                    ]),
-                ],
-            ];
-        }
+                    ],
+                ];
+            }
+        );
+        $toolCalls = filter_nulls($toolCalls);
 
         $payload['choices'][0]['message']['tool_calls'] = $toolCalls;
         $payload['choices'][0]['message']['content'] = replace(
@@ -170,5 +239,4 @@ class Hermes2ProPlugin implements Plugin
             )
         );
     }
-
 }
