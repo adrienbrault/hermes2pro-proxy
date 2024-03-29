@@ -19,7 +19,7 @@ class Converter
 {
     public function convertRequest(string $body): ?string
     {
-        $payload = decode($body, true);
+        $payload = decode($body);
 
         $shape = shape([
             'model' => string(),
@@ -48,7 +48,7 @@ class Converter
             "Don't make assumptions about what values to plug into functions.",
             'Here are the available tools:',
             '<tools>',
-            json_encode($tools),
+            encode($tools),
             '</tools>',
             'Use the following json schema for each tool call you will make:',
             '{"type": "object", "properties": {"name": {"title": "Name", "type": "string"}, "arguments": {"title": "Arguments", "type": "object"}}, "required": ["arguments", "name"], "title": "FunctionCall"}',
@@ -96,7 +96,7 @@ class Converter
                             ...map(
                                 $message['tool_calls'],
                                 static function (array $toolCall): string {
-                                    return sprintf("<tool_call>\n%s\n</tool_call>", json_encode([
+                                    return sprintf("<tool_call>\n%s\n</tool_call>", encode([
                                         'name' => $toolCall['function']['name'],
                                         'arguments' => decode($toolCall['function']['arguments'] ?? '[]'),
                                     ]));
