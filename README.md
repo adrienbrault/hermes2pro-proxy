@@ -41,6 +41,8 @@ $client = OpenAI::factory()
 Then use `adrienbrault/nous-hermes2pro:Q4_K_M` as the `model` in your chat requests.
 There are [more tags/quantizations available][ollama_url].
 
+See [demo/](demo/).
+
 [hf_url]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B
 [hf_url_pf]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B#prompt-format-for-function-calling
 [oa_fc]: https://platform.openai.com/docs/guides/function-calling
