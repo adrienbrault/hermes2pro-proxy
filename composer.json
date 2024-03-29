@@ -1,7 +1,27 @@
 {
     "name": "adrienbrault/hermes2pro",
-    "type": "library",
     "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Adrien Brault",
+            "email": "adrien.brault@gmail.com"
+        }
+    ],
+    "require": {
+        "azjezz/psl": "^2.0",
+        "php-http/client-common": "^2.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.42",
+        "guzzlehttp/guzzle": "^7.8",
+        "monolog/monolog": "^3.5",
+        "openai-php/client": "^0.8.4",
+        "php-http/logger-plugin": "^1.3",
+        "phpunit/phpunit": "^9.6",
+        "symfony/var-dumper": "^7.0",
+        "symplify/easy-coding-standard": "^12.1"
+    },
     "autoload": {
         "psr-4": {
             "AdrienBrault\\Hermes2Pro\\": "src/"
@@ -12,27 +32,9 @@
             "AdrienBrault\\Hermes2Pro\\Tests\\": "tests/"
         }
     },
-    "authors": [
-        {
-            "name": "Adrien Brault",
-            "email": "adrien.brault@gmail.com"
-        }
-    ],
-    "require": {
-        "php-http/client-common": "^2.0",
-        "azjezz/psl": "^2.0"
-    },
-    "require-dev": {
-        "openai-php/client": "^0.8.4",
-        "guzzlehttp/guzzle": "^7.8",
-        "symfony/var-dumper": "^7.0",
-        "phpunit/phpunit": "^9.6",
-        "php-http/logger-plugin": "^1.3",
-        "monolog/monolog": "^3.5",
-        "symplify/easy-coding-standard": "^12.1"
-    },
     "config": {
         "allow-plugins": {
+            "ergebnis/composer-normalize": true,
             "php-http/discovery": true
         }
     }
