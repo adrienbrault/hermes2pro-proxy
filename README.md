@@ -43,6 +43,8 @@ There are [more tags/quantizations available][ollama_url].
 
 The model and this plugin supports parallel function calling. Note that streaming is not currently supported.
 
+Note that the plugin is only active if the request/response model starts with `adrienbrault/nous-hermes2pro`.
+
 See [demo/](demo/).
 
 [hf_url]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B

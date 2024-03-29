@@ -45,10 +45,12 @@ class Hermes2ProPluginTest extends TestCase
                 function (RequestInterface $nextRequest) use ($request) {
                     $this->assertSame($request, $nextRequest); // no changes
                 },
-                $mockedResponse = new Response(200, [], json_encode([
+                $mockedResponse = new Response(200, [], encode([
+                    'model' => 'adrienbrault/nous-hermes2pro:Q2_K',
                     'choices' => [
                         [
-                            'message' => 'I am fine, thank you.',
+                            'role' => 'assistant',
+                            'content' => 'I am fine, thank you.',
                         ],
                     ],
                 ]))
@@ -56,7 +58,10 @@ class Hermes2ProPluginTest extends TestCase
             $this->mockFirst()
         )->wait();
 
-        $this->assertSame($mockedResponse, $response);
+        $this->assertSame(
+            $mockedResponse->getBody()->getContents(),
+            $response->getBody()->getContents()
+        );
     }
 
     public function testTools()
@@ -77,6 +82,7 @@ class Hermes2ProPluginTest extends TestCase
         ]));
 
         $mockedResponse = new Response(200, [], json_encode([
+            'model' => 'adrienbrault/nous-hermes2pro:Q2_K',
             'choices' => [
                 [
                     'message' => [
