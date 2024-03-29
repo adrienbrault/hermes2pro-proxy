@@ -1,6 +1,6 @@
 [NousResearch/Hermes-2-Pro-Mistral-7B][hf_url] is an open source LLM with great function calling capabilities.
 
-This PSR-18 plugin converts OpenAI API requests/responses that use [function calling][oa_fc] to [the Hermes2Pro prompt format][hf_url_pf].
+This PSR-18 plugin converts OpenAI API requests/responses that use [function calling][oa_fc] to and from [the Hermes2Pro prompt format][hf_url_pf].
 
 Install [ollama][ollama] ([docker][ollama_docker]) and pull the model:
 
