@@ -2,6 +2,7 @@
 
 namespace AdrienBrault\Hermes2Pro;
 
+use Psl\Json\Exception\DecodeException;
 use function Psl\Json\decode;
 use function Psl\Json\encode;
 use function Psl\Regex\every_match;
@@ -19,7 +20,11 @@ class Converter
 {
     public function convertRequest(string $body): ?string
     {
-        $payload = decode($body);
+        try {
+            $payload = decode($body);
+        } catch (DecodeException $e) {
+            return null; // ignore
+        }
 
         $shape = shape([
             'model' => string(),
@@ -123,7 +128,11 @@ class Converter
 
     public function convertResponse(string $body): ?string
     {
-        $payload = decode($body);
+        try {
+            $payload = decode($body);
+        } catch (DecodeException $e) {
+            return null; // ignore
+        }
 
         if (! array_key_exists('choices', $payload)
             || ! is_array($payload['choices']) === 0

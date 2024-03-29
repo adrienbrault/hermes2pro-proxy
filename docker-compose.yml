@@ -1,0 +1,10 @@
+services:
+  proxy:
+    image: adrienbrault/hermes2pro-proxy:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "11440:80"
+    environment:
+      OPENAI_BASE_URI: http://docker.for.mac.host.internal:11434

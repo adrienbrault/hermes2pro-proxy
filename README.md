@@ -4,6 +4,8 @@ This [PSR-18][psr18] plugin converts OpenAI API requests/responses that use [fun
 
 It lets you use Hermes2Pro function calling with the same OpenAI api client code that you currently use with `api.openai.com`.
 
+# PHP Library
+
 Install [ollama][ollama] ([docker][ollama_docker]) and pull the model:
 
 ```console
@@ -25,7 +27,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $client = OpenAI::factory()
     ->withApiKey(getenv('OPENAI_API_KEY'))
-    ->withBaseUri(getenv('OLLAMA_HOST') ?: 'http://localhost:11434/v1')
+    ->withBaseUri(sprintf(
+        '%s/v1',
+        getenv('OLLAMA_HOST') ?: 'http://localhost:11434'
+    ))
     ->withHttpClient(
         new PluginClient(
             Psr18ClientDiscovery::find(),
@@ -46,6 +51,21 @@ The model and this plugin supports parallel function calling. Note that streamin
 Note that the plugin is only active if the request/response model starts with `adrienbrault/nous-hermes2pro`.
 
 See [demo/](demo/).
+
+# Docker Proxy
+
+If you don't use PHP, you can use the docker http proxy to convert requests/responses to/from the Hermes2Pro format:
+
+```console
+$ docker run -it --rm \
+    -e OPENAI_BASE_URI=http://docker.for.mac.host.internal:11434 \
+    -p 11440:80 \
+    adrienbrault/hermes2pro-proxy
+
+$ MODEL="adrienbrault/nous-hermes2pro:Q4_K_M" \
+    OPENAI_BASE_URI="http://localhost:11440/v1" \
+    php demo/openai.php
+```
 
 [hf_url]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B
 [hf_url_pf]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B#prompt-format-for-function-calling

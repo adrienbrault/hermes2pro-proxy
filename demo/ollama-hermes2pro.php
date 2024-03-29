@@ -8,12 +8,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $client = OpenAI::factory()
     ->withApiKey('sk-xxx')
-    ->withBaseUri(
-        sprintf(
-            '%s/v1',
-            getenv('OLLAMA_HOST') ?: 'http://localhost:11434'
-        )
-    )
+    ->withBaseUri(sprintf(
+        '%s/v1',
+        getenv('OLLAMA_HOST') ?: 'http://localhost:11434'
+    ))
     ->withHttpClient(
         new PluginClient(
             Psr18ClientDiscovery::find(),
