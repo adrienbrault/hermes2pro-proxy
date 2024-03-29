@@ -1,3 +1,5 @@
+This demo features a single tool to get the current time in a given timezone.
+
 To run `demo/openai.php` you must set the `OPENAI_API_KEY` environment variable.
 To run `demo/ollama-hermes2pro.php` you can set `OLLAMA_HOST` if you want to use a host different than the default `http://localhost:11434`.
 
