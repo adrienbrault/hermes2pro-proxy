@@ -41,6 +41,8 @@ $client = OpenAI::factory()
 Then use `adrienbrault/nous-hermes2pro:Q4_K_M` as the `model` in your chat requests.
 There are [more tags/quantizations available][ollama_url].
 
+The model and this plugin supports parallel function calling. Note that streaming is not currently supported.
+
 See [demo/](demo/).
 
 [hf_url]: https://huggingface.co/NousResearch/Hermes-2-Pro-Mistral-7B
