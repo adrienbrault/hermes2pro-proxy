@@ -12,6 +12,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 class Hermes2ProPlugin implements Plugin
 {
     private Converter $converter;
+
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
@@ -37,7 +38,7 @@ class Hermes2ProPlugin implements Plugin
      */
     private function getHermes2ProRequest(RequestInterface $request): ?RequestInterface
     {
-        if (!str_ends_with($request->getUri()->getPath(), '/chat/completions')) {
+        if (! str_ends_with($request->getUri()->getPath(), '/chat/completions')) {
             return $request;
         }
 
@@ -46,7 +47,7 @@ class Hermes2ProPlugin implements Plugin
 
         $newBody = $this->converter->convertRequest($body);
 
-        if (null === $newBody) {
+        if ($newBody === null) {
             return $request;
         }
 
@@ -62,7 +63,7 @@ class Hermes2ProPlugin implements Plugin
 
         $newBody = $this->converter->convertResponse($body);
 
-        if (null === $newBody) {
+        if ($newBody === null) {
             return $response;
         }
 

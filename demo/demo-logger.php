@@ -9,7 +9,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 $formatter = new class() implements Formatter {
-    #[\Override] public function formatRequest(RequestInterface $request)
+    #[\Override]
+    public function formatRequest(RequestInterface $request)
     {
         $contents = $request->getBody()->getContents();
         $request->getBody()->rewind();
@@ -23,7 +24,8 @@ $formatter = new class() implements Formatter {
         );
     }
 
-    #[\Override] public function formatResponse(ResponseInterface $response)
+    #[\Override]
+    public function formatResponse(ResponseInterface $response)
     {
         $contents = $response->getBody()->getContents();
         $response->getBody()->rewind();
@@ -41,5 +43,5 @@ $formatter = new class() implements Formatter {
 $verbose = count(array_intersect(['-v', '-vv', '-vvv'], $_SERVER['argv'])) > 0;
 
 return new LoggerPlugin(new Logger('http', [
-    new StreamHandler('php://stderr', $verbose ? Level::Debug : Level::Error)
+    new StreamHandler('php://stderr', $verbose ? Level::Debug : Level::Error),
 ]), $formatter);

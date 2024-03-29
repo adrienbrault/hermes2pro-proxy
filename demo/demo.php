@@ -1,7 +1,6 @@
 <?php
 
 use function Psl\Json\decode;
-use function Psl\Json\encode;
 use function Psl\Vec\filter;
 
 $tools = [
@@ -14,19 +13,19 @@ $tools = [
                 'properties' => [
                     'timezone' => [
                         'type' => 'string',
-                        'description' => 'The timezone to get the current time for. Example: "America/Los_Angeles" or "Asia/Tokyo"'
-                    ]
+                        'description' => 'The timezone to get the current time for. Example: "America/Los_Angeles" or "Asia/Tokyo"',
+                    ],
                 ],
-                'required' => ['timezone']
-            ]
-        ]
-    ]
+                'required' => ['timezone'],
+            ],
+        ],
+    ],
 ];
 
 return function (OpenAI\Client $client, string $model) use ($tools) {
     $userPrompt = 'What time is it in france? What about new york city?';
 
-    $validArgs = filter(array_slice($_SERVER['argv'], 1), fn($arg) => !str_starts_with($arg, '-'));
+    $validArgs = filter(array_slice($_SERVER['argv'], 1), fn ($arg) => ! str_starts_with($arg, '-'));
     $userPrompt = $validArgs === [] ? $userPrompt : implode(' ', $validArgs);
 
     $messages = [
@@ -36,7 +35,7 @@ return function (OpenAI\Client $client, string $model) use ($tools) {
         ],
         [
             'role' => 'user',
-            'content' => $userPrompt
+            'content' => $userPrompt,
         ],
     ];
 

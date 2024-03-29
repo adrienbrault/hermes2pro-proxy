@@ -6,7 +6,6 @@ use AdrienBrault\Hermes2Pro\Hermes2ProPlugin;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Http\Promise\FulfilledPromise;
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -32,6 +31,7 @@ class Hermes2ProPluginTest extends TestCase
             ])),
         ];
     }
+
     /**
      * @dataProvider getTestNoopData
      */
@@ -74,10 +74,10 @@ class Hermes2ProPluginTest extends TestCase
                 $firstMessage = [
                     'role' => 'user',
                     'content' => 'What time is it in france? In NYC?',
-                ]
+                ],
             ],
             'tools' => [
-                $this->getTimeTool()
+                $this->getTimeTool(),
             ],
         ]));
 
@@ -130,7 +130,7 @@ class Hermes2ProPluginTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'get_current_time',
-                'arguments' => '{"location":"france"}'
+                'arguments' => '{"location":"france"}',
             ],
             $responsePayload['choices'][0]['message']['tool_calls'][0]['function']
         );
@@ -141,7 +141,7 @@ class Hermes2ProPluginTest extends TestCase
         $this->assertEquals(
             [
                 'name' => 'get_current_time',
-                'arguments' => '{"location":"NYC"}'
+                'arguments' => '{"location":"NYC"}',
             ],
             $responsePayload['choices'][0]['message']['tool_calls'][1]['function']
         );
@@ -163,10 +163,10 @@ class Hermes2ProPluginTest extends TestCase
                     'tool_call_id' => 'call_123',
                     'name' => 'get_current_time',
                     'content' => '{"time":"12:34:56"}',
-                ]
+                ],
             ],
             'tools' => [
-                $this->getTimeTool()
+                $this->getTimeTool(),
             ],
         ]));
 
@@ -190,24 +190,6 @@ class Hermes2ProPluginTest extends TestCase
         )->wait();
     }
 
-    private function mockFirst(): callable
-    {
-        // do nothing ...
-        return function () {};
-    }
-
-    private function mockNext(callable $assertRequest, ResponseInterface $response)
-    {
-        return function (RequestInterface $request) use ($assertRequest, $response) {
-            $assertRequest($request);
-
-            return new FulfilledPromise($response);
-        };
-    }
-
-    /**
-     * @return array
-     */
     public function getTimeTool(): array
     {
         return [
@@ -218,12 +200,28 @@ class Hermes2ProPluginTest extends TestCase
                     'type' => 'object',
                     'properties' => [
                         'location' => [
-                            'type' => 'string'
-                        ]
+                            'type' => 'string',
+                        ],
                     ],
-                    'required' => ['location']
-                ]
-            ]
+                    'required' => ['location'],
+                ],
+            ],
         ];
+    }
+
+    private function mockFirst(): callable
+    {
+        // do nothing ...
+        return function () {
+        };
+    }
+
+    private function mockNext(callable $assertRequest, ResponseInterface $response)
+    {
+        return function (RequestInterface $request) use ($assertRequest, $response) {
+            $assertRequest($request);
+
+            return new FulfilledPromise($response);
+        };
     }
 }

@@ -6,6 +6,7 @@ use function Psl\Json\decode;
 use function Psl\Json\encode;
 use function Psl\Regex\every_match;
 use function Psl\Regex\replace;
+use function Psl\SecureRandom\string as randomString;
 use function Psl\Type\mixed_dict;
 use function Psl\Type\optional;
 use function Psl\Type\shape;
@@ -13,8 +14,6 @@ use function Psl\Type\string;
 use function Psl\Type\vec;
 use function Psl\Vec\filter_nulls;
 use function Psl\Vec\map;
-use function Psl\SecureRandom\string as randomString;
-
 
 class Converter
 {
@@ -30,8 +29,8 @@ class Converter
             'tools' => optional(vec(mixed_dict())),
         ], true);
 
-        if (!$shape->matches($payload)
-            || !str_starts_with($payload['model'], 'adrienbrault/nous-hermes2pro')
+        if (! $shape->matches($payload)
+            || ! str_starts_with($payload['model'], 'adrienbrault/nous-hermes2pro')
         ) {
             return null;
         }
@@ -42,7 +41,7 @@ class Converter
             return null;
         }
 
-        $systemPrompt = implode(" ", [
+        $systemPrompt = implode(' ', [
             'You are a function calling AI model.',
             'You are provided with function signatures within <tools></tools> XML tags.',
             'You may call one or more functions to assist with the user query.',
@@ -64,9 +63,9 @@ class Converter
             $payload['messages'][0]['content'] = \Psl\Str\join(
                 [
                     $systemPrompt,
-                    $payload['messages'][0]['content']
+                    $payload['messages'][0]['content'],
                 ],
-                " "
+                ' '
             );
         } else {
             $payload['messages'] = [
@@ -102,14 +101,14 @@ class Converter
                                         'arguments' => decode($toolCall['function']['arguments'] ?? '[]'),
                                     ]));
                                 }
-                            )
+                            ),
                         ],
                         "\n"
                     );
 
                     return [
                         'role' => 'assistant',
-                        'content' => \Psl\Str\trim($content)
+                        'content' => \Psl\Str\trim($content),
                     ];
                 }
 
@@ -126,9 +125,9 @@ class Converter
     {
         $payload = decode($body);
 
-        if (!array_key_exists('choices', $payload)
-            || !is_array($payload['choices']) === 0
-            || !str_starts_with($payload['model'] ?? '', 'adrienbrault/nous-hermes2pro')
+        if (! array_key_exists('choices', $payload)
+            || ! is_array($payload['choices']) === 0
+            || ! str_starts_with($payload['model'] ?? '', 'adrienbrault/nous-hermes2pro')
         ) {
             return null;
         }
@@ -136,7 +135,7 @@ class Converter
         $payload['choices'] = map(
             $payload['choices'],
             static function (array $choice): array {
-                if (!is_array($choice['message'] ?? null)) {
+                if (! is_array($choice['message'] ?? null)) {
                     return $choice;
                 }
 
@@ -206,8 +205,6 @@ class Converter
                 return $choice;
             }
         );
-
-
 
         return encode($payload);
     }
