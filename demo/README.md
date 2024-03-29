@@ -3,6 +3,8 @@ This demo features a single tool to get the current time in a given timezone.
 To run `demo/openai.php` you must set the `OPENAI_API_KEY` environment variable.
 To run `demo/ollama-hermes2pro.php` you can set `OLLAMA_HOST` if you want to use a host different than the default `http://localhost:11434`.
 
+https://github.com/adrienbrault/hermes2pro-php/assets/611271/ee556922-2a11-42a1-bc40-198811342c3a
+
 ```console
 $ php demo/ollama-hermes2pro.php
 ^ "The current time in France (Paris) is 12:59:40, and the current time in New York City is 07:59:40."
