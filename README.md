@@ -16,7 +16,7 @@ $ ollama pull adrienbrault/nous-hermes2pro:Q4_K_M
 
 Install [this package][packagist]:
 ```console
-$ composer require adrienbrault/hermes2pro@dev
+$ composer require adrienbrault/hermes2pro:@dev
 ```
 
 Then update your code to use the plugin:
