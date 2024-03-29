@@ -2,7 +2,9 @@
 
 This [PSR-18][psr18] plugin converts OpenAI API requests/responses that use [function calling][oa_fc] to and from [the Hermes2Pro prompt format][hf_url_pf].
 
-It lets you use Hermes2Pro function calling with the same OpenAI api client code that you currently use with `api.openai.com`.
+It lets you use Hermes2Pro function calling with the same OpenAI api client code that you currently use.
+
+[An http proxy docker image](#docker-proxy) is available for non PHP projects.
 
 # PHP Library
 
@@ -54,7 +56,7 @@ See [demo/](demo/).
 
 # Docker Proxy
 
-If you don't use PHP, you can use the docker http proxy to convert requests/responses to/from the Hermes2Pro format:
+A docker http proxy is available to convert requests/responses to/from the Hermes2Pro format:
 
 ```console
 $ docker run -it --rm \
