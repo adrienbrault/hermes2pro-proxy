@@ -87,7 +87,7 @@ class Converter
             static function (array $message): array {
                 if ($message['role'] === 'tool') {
                     return [
-                        'role' => 'system',
+                        'role' => 'tool',
                         'content' => sprintf('<tool_response>%s</tool_response>', $message['content']),
                     ];
                 }
