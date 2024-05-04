@@ -49,16 +49,19 @@ return function (OpenAI\Client $client, string $model) use ($tools) {
 
     // Invoke functions and feed back results
     foreach ($result->choices[0]->message->toolCalls as $toolCall) {
-        assert($toolCall->function->name === 'get_current_time');
+        if ($toolCall->function->name === 'get_current_time') {
 
-        $timezone = decode($toolCall->function->arguments)['timezone'];
-
-        $messages[] = [
-            'role' => 'tool',
-            'tool_call_id' => $toolCall->id,
-            'name' => $toolCall->function->name,
-            'content' => (new DateTime('now', new DateTimeZone($timezone)))->format('H:i:s'),
-        ];
+            $timezone = decode($toolCall->function->arguments)['timezone'];
+    
+            $messages[] = [
+                'role' => 'tool',
+                'tool_call_id' => $toolCall->id,
+                'name' => $toolCall->function->name,
+                'content' => (new DateTime('now', new DateTimeZone($timezone)))->format('H:i:s'),
+            ];
+        } else {
+            throw new \Exception(sprintf('Tool "%s" not available', $toolCall->function->name));
+        }
     }
 
     $result = $client->chat()->create([
